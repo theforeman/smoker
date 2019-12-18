@@ -4,6 +4,7 @@ from __future__ import print_function
 from collections import namedtuple
 
 import pytest
+import requests
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -60,22 +61,38 @@ def chrome_options(chrome_options):
     return chrome_options
 
 
-@pytest.fixture
-def user(variables):
+def _user(variables):
     return User(variables.get('username', 'admin'), variables.get('password', 'changeme'),
                 variables.get('name', 'Admin User'))
 
 
-@pytest.fixture(params=PAGES)
-def url(request, base_url):
-    if not base_url:
-        raise ValueError('Base URL not specified')
-    return base_url + request.param
+@pytest.fixture(scope='session')
+def user(variables):
+    return _user(variables)
+
+
+def pytest_generate_tests(metafunc):
+    if 'url' in metafunc.fixturenames:
+        base_url = metafunc.config.option.base_url
+        assert base_url
+
+        # mimic the variables fixture from pytest-variables
+        user_obj = _user(metafunc.config._variables)  # pylint: disable=protected-access
+
+        response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password))
+        if response.status_code == 404:
+            # Menu is only available since Foreman 2.0
+            pages = [base_url + page for page in PAGES]
+        else:
+            assert response
+            pages = [pytest.param(base_url + page['url'], id=page['name']) for page in response.json()]
+
+        metafunc.parametrize('url', pages)
 
 
 @pytest.mark.nondestructive
 @pytest.mark.selenium
-def test_page(selenium, user, url):
+def test_menu_item(selenium, user, url):
     selenium.get(url)
     assert selenium.current_url.endswith('/users/login')
     login_field = selenium.find_element_by_name('login[login]')
