@@ -79,7 +79,8 @@ def pytest_generate_tests(metafunc):
         # mimic the variables fixture from pytest-variables
         user_obj = _user(metafunc.config._variables)  # pylint: disable=protected-access
 
-        response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password))
+        response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password),
+                                verify=False)
         if response.status_code == 404:
             # Menu is only available since Foreman 2.0
             pages = [base_url + page for page in PAGES]
