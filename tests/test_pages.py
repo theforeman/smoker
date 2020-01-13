@@ -101,7 +101,7 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.selenium
 def test_menu_item(selenium, user, url):
     selenium.get(url)
-    assert selenium.current_url.endswith('/users/login')
+    assert selenium.current_url.endswith('/users/login'), 'Redirect to login page'
     login_field = selenium.find_element_by_name('login[login]')
     login_field.send_keys(user.username)
     password_field = selenium.find_element_by_name('login[password]')
@@ -111,12 +111,13 @@ def test_menu_item(selenium, user, url):
     account_menu = WebDriverWait(selenium, 10).until(
         EC.presence_of_element_located((By.ID, 'account_menu'))
     )
-    assert account_menu.text == user.name
-    assert selenium.current_url == url
+    assert account_menu.text == user.name, 'Logged in user shows the correct name'
+    assert selenium.current_url == url, 'Correct page is loaded'
 
     if selenium.name == 'firefox':
         print("Firefox hasn't implemented webdriver logging")
         print("https://github.com/mozilla/geckodriver/issues/284")
 
     logs = selenium.get_log('browser')
-    assert not [x['message'] for x in logs if x.get('level') == 'SEVERE']
+    severe_messages = [x['message'] for x in logs if x.get('level') == 'SEVERE']
+    assert severe_messages == [], 'Error messages with log level SEVERE in browser console'
