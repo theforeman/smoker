@@ -61,6 +61,12 @@ def chrome_options(chrome_options):
     return chrome_options
 
 
+@pytest.fixture(scope='session')
+def session_capabilities(session_capabilities):
+    session_capabilities['acceptInsecureCerts'] = True
+    return session_capabilities
+
+
 def _user(variables):
     return User(variables.get('username', 'admin'), variables.get('password', 'changeme'),
                 variables.get('name', 'Admin User'))
