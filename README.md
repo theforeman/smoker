@@ -73,3 +73,12 @@ To see all markers:
 ```
 pytest --markers
 ```
+
+## Launching Linux clients
+
+The client tests will automatically run on any local running podman containers. They can be launched using
+
+```
+podman run --rm --detach --label smoker-linux-client --name centos-7 centos:7 /sbin/init
+podman run --rm --detach --label smoker-linux-client --name centos-8 centos:8 /sbin/init
+```
