@@ -1,4 +1,5 @@
 pytest-base-url
 pytest-selenium
+pytest-testinfra
 pytest-variables
 pytest-xdist
