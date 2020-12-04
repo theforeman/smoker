@@ -2,5 +2,6 @@ apypie
 pytest-base-url
 pytest-html
 pytest-selenium
+pytest-testinfra
 pytest-variables
 pytest-xdist

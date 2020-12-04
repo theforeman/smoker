@@ -1,0 +1,13 @@
+[C6-base]
+name=CentOS-6 - Base
+baseurl=http://vault.centos.org/centos/6/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+
+[C6-updates]
+name=CentOS-6 - Updates
+baseurl=http://vault.centos.org/centos/6/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1

@@ -73,3 +73,21 @@ To see all markers:
 ```
 pytest --markers
 ```
+
+## Client Tests
+
+The client tests require the input set of containers to exist prior to running. All the required images can be built based on the version of Foreman being tested:
+
+```
+./build_images.sh <version>
+```
+
+The set of clients to test must also be specified in `variables.json`:
+
+```
+  "clients": [
+    "smoker-test/centos8:nightly",
+    "smoker-test/centos7:nightly",
+    "smoker-test/centos6:nightly"
+  ]
+```

@@ -1,0 +1,16 @@
+# Place this file in your /etc/yum.repos.d/ directory
+
+[epel-subscription-manager]
+name=Tools and libraries for Red Hat subscription management.
+baseurl=http://repos.fedorapeople.org/repos/candlepin/subscription-manager/epel-$releasever/$basearch/
+enabled=1
+skip_if_unavailable=1
+gpgcheck=0
+
+[epel-subscription-manager-source]
+name=Tools and libraries for Red Hat subscription management. - Source
+baseurl=http://repos.fedorapeople.org/repos/candlepin/subscription-manager/epel-$releasever/SRPMS
+enabled=0
+skip_if_unavailable=1
+gpgcheck=0
+
