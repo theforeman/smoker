@@ -1,8 +1,9 @@
+import apypie
 import pytest
 import requests
-import apypie
 
 from collections import namedtuple
+from urllib.parse import urlparse
 
 User = namedtuple('User', ['username', 'password', 'name'])
 
@@ -42,6 +43,8 @@ PAGES = [
 
 
 def pytest_generate_tests(metafunc):
+    variables = metafunc.config._variables  # pylint: disable=protected-access
+
     if 'url' in metafunc.fixturenames:
         base_url = metafunc.config.option.base_url
         assert base_url
@@ -63,6 +66,11 @@ def pytest_generate_tests(metafunc):
 
         metafunc.parametrize('url', pages)
 
+    if 'katello_client' in metafunc.fixturenames:
+        clients = variables.get('clients', [])
+
+        metafunc.parametrize('katello_client', clients, indirect=True)
+
 
 def _user(variables):
     return User(variables.get('username', 'admin'), variables.get('password', 'changeme'),
@@ -75,6 +83,20 @@ def user(variables):
 
 
 @pytest.fixture(scope='session')
+def entities():
+    return {
+        'organization_label': 'Test_Organization',
+        'activation_key': 'Test AK',
+        'product': 'Test Product',
+        'product_label': 'Test_Product',
+        'yum_repository': 'Zoo',
+        'yum_repository_label': 'Zoo',
+        'errata_id': 'RHEA-2012:0055',
+        'container_repository_label': 'foremanbusybox'
+    }
+
+
+@pytest.fixture(scope='session')
 def api(user, base_url):
     return apypie.Api(
         uri=base_url,
@@ -83,3 +105,8 @@ def api(user, base_url):
         api_version=2,
         verify_ssl=False,
     )
+
+
+@pytest.fixture(scope='session')
+def registration_hostname(base_url):
+    return urlparse(base_url).hostname
