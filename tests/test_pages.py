@@ -6,6 +6,8 @@ from collections import namedtuple
 import pytest
 import requests
 
+from urllib.parse import urlparse
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -115,7 +117,7 @@ def test_menu_item(selenium, user, url):
         EC.presence_of_element_located((By.ID, 'account_menu'))
     )
     assert account_menu.text == user.name, 'Logged in user shows the correct name'
-    assert selenium.current_url == url, 'Correct page is loaded'
+    assert url in selenium.current_url, 'Correct page is loaded'
 
     if selenium.name == 'firefox':
         print("Firefox hasn't implemented webdriver logging")
