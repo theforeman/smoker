@@ -2,6 +2,8 @@
 from __future__ import print_function
 
 from collections import namedtuple
+from typing import Union, KeysView, List
+from urllib.parse import ParseResult, urlparse, parse_qs, urlencode
 
 import pytest
 import requests
@@ -100,6 +102,14 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('url', pages)
 
 
+def filtered_url_query(url: str, allowed_query_params: Union[List, KeysView]) -> ParseResult:
+    parsed_url = urlparse(url)
+    query = parse_qs(parsed_url.query)
+    reduced_query = {key: value for key, value in query.items() if key in allowed_query_params}
+    new_query = urlencode(reduced_query, doseq=True)
+    return parsed_url._replace(query=new_query)
+
+
 @pytest.mark.nondestructive
 @pytest.mark.selenium
 def test_menu_item(selenium, user, url):
@@ -115,7 +125,11 @@ def test_menu_item(selenium, user, url):
         EC.presence_of_element_located((By.ID, 'account_menu'))
     )
     assert account_menu.text == user.name, 'Logged in user shows the correct name'
-    assert selenium.current_url == url, 'Correct page is loaded'
+
+    expected_parsed_url = urlparse(url)
+    allowed_query_params = parse_qs(expected_parsed_url.query).keys()
+    actual_parsed_url = filtered_url_query(selenium.current_url, allowed_query_params)
+    assert actual_parsed_url == expected_parsed_url, 'Correct page is loaded'
 
     if selenium.name == 'firefox':
         print("Firefox hasn't implemented webdriver logging")
