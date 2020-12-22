@@ -1,3 +1,4 @@
+apypie
 pytest-base-url
 pytest-selenium
 pytest-variables

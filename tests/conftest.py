@@ -1,5 +1,6 @@
 import pytest
 import requests
+import apypie
 
 from collections import namedtuple
 
@@ -71,3 +72,14 @@ def _user(variables):
 @pytest.fixture(scope='session')
 def user(variables):
     return _user(variables)
+
+
+@pytest.fixture(scope='session')
+def api(user, base_url):
+    return apypie.Api(
+        uri=base_url,
+        username=user.username,
+        password=user.password,
+        api_version=2,
+        verify_ssl=False,
+    )
