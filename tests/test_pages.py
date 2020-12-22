@@ -5,45 +5,10 @@ from typing import Union, KeysView, List
 from urllib.parse import ParseResult, urlparse, parse_qs, urlencode
 
 import pytest
-import requests
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
-PAGES = [
-    '/',
-    '/architectures',
-    '/hosts',
-    '/models',
-    '/media',
-    '/operatingsystems',
-    '/templates/ptables',
-    '/templates/provisioning_templates',
-    '/hostgroups',
-    '/common_parameters',
-    '/environments',
-    '/puppetclasses',
-    '/config_groups',
-    '/variable_lookup_keys',
-    '/puppetclass_lookup_keys',
-    '/smart_proxies',
-    '/compute_resources',
-    '/compute_profiles',
-    '/subnets',
-    '/domains',
-    '/http_proxies',
-    '/realms',
-    '/locations',
-    '/organizations',
-    '/auth_source_ldaps',
-    '/users',
-    '/usergroups',
-    '/roles',
-    '/bookmarks',
-    '/settings',
-    '/about',
-]
 
 
 @pytest.fixture

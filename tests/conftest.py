@@ -1,8 +1,43 @@
 import pytest
+import requests
 
 from collections import namedtuple
 
 User = namedtuple('User', ['username', 'password', 'name'])
+
+PAGES = [
+    '/',
+    '/architectures',
+    '/hosts',
+    '/models',
+    '/media',
+    '/operatingsystems',
+    '/templates/ptables',
+    '/templates/provisioning_templates',
+    '/hostgroups',
+    '/common_parameters',
+    '/environments',
+    '/puppetclasses',
+    '/config_groups',
+    '/variable_lookup_keys',
+    '/puppetclass_lookup_keys',
+    '/smart_proxies',
+    '/compute_resources',
+    '/compute_profiles',
+    '/subnets',
+    '/domains',
+    '/http_proxies',
+    '/realms',
+    '/locations',
+    '/organizations',
+    '/auth_source_ldaps',
+    '/users',
+    '/usergroups',
+    '/roles',
+    '/bookmarks',
+    '/settings',
+    '/about',
+]
 
 
 def pytest_generate_tests(metafunc):
