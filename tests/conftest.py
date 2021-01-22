@@ -1,6 +1,7 @@
 import pytest
 import requests
 import apypie
+import time
 
 from collections import namedtuple
 
@@ -83,3 +84,32 @@ def api(user, base_url):
         api_version=2,
         verify_ssl=False,
     )
+
+
+@pytest.fixture(scope='session')
+def entities():
+    return {
+        'organization_label': 'Test_Organization',
+        'activation_key': 'Test AK',
+        'product': 'Test Product',
+        'product_label': 'Test_Product',
+        'yum_repository': 'Zoo',
+        'yum_repository_label': 'Zoo',
+        'errata_id': 'RHEA-2012:0055',
+        'container_repository_label': 'foremanbusybox'
+    }
+
+
+def wait_for_task(task, api):
+    duration = 60
+    poll = 15
+
+    while task['state'] not in ['paused', 'stopped']:
+        duration -= poll
+        if duration <= 0:
+            break
+        time.sleep(poll)
+
+        task = api.resource('foreman_tasks').call('show', {'id': task['id']})
+
+    return task
