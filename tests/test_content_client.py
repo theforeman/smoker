@@ -12,8 +12,8 @@ def katello_client(request, entities, registration_hostname):
     container_id = subprocess.check_output([
         'podman',
         'run',
-        '--volume',
-        '/dev/log:/dev/log',
+        '--systemd',
+        'always',
         '--detach',
         '--tty',
         request.param
