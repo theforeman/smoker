@@ -32,6 +32,12 @@ def session_capabilities(session_capabilities):
     return session_capabilities
 
 
+@pytest.fixture
+def selenium(selenium):
+    selenium.set_window_size(1920, 1080)
+    return selenium
+
+
 def filtered_url_query(url: str, allowed_query_params: Union[List, KeysView]) -> ParseResult:
     parsed_url = urlparse(url)
     query = parse_qs(parsed_url.query)
@@ -60,7 +66,7 @@ def test_menu_item(selenium, user, url):
         account_menu = WebDriverWait(selenium, 10).until(
             EC.presence_of_element_located((By.ID, 'account_menu'))
         )
-    assert account_menu.get_attribute('textContent') == user.name, 'Logged in user shows the correct name'
+    assert account_menu.text == user.name, 'Logged in user shows the correct name'
 
     expected_parsed_url = urlparse(url)
     allowed_query_params = parse_qs(expected_parsed_url.query).keys()
