@@ -34,7 +34,7 @@ def session_capabilities(session_capabilities):
 
 @pytest.fixture
 def selenium(selenium):
-    selenium.set_window_size(2560, 1440)
+    selenium.set_window_size(1920, 1080)
     return selenium
 
 
