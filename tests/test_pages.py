@@ -12,6 +12,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
 
+EXCLUDE_ERRORS = (
+    # https://projects.theforeman.org/issues/36093
+    'Scrollbar test exception: TypeError:',
+)
+
+
 @pytest.fixture
 def firefox_options(firefox_options):
     firefox_options.add_argument('--headless')
@@ -76,5 +82,5 @@ def test_menu_item(selenium, user, url):
         print("https://github.com/mozilla/geckodriver/issues/284")
 
     logs = selenium.get_log('browser')
-    severe_messages = [x['message'] for x in logs if x.get('level') == 'SEVERE']
+    severe_messages = [x['message'] for x in logs if x.get('level') == 'SEVERE' and not any(excl in x['message'] for excl in EXCLUDE_ERRORS)]
     assert severe_messages == [], 'Error messages with log level SEVERE in browser console'
