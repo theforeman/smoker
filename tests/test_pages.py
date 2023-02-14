@@ -51,9 +51,9 @@ def filtered_url_query(url: str, allowed_query_params: Union[List, KeysView]) ->
 def test_menu_item(selenium, user, url):
     selenium.get(url)
     assert selenium.current_url.endswith('/users/login'), 'Redirect to login page'
-    login_field = selenium.find_element_by_name('login[login]')
+    login_field = selenium.find_element(By.NAME, 'login[login]')
     login_field.send_keys(user.username)
-    password_field = selenium.find_element_by_name('login[password]')
+    password_field = selenium.find_element(By.NAME, 'login[password]')
     password_field.send_keys(user.password)
     password_field.submit()
 
