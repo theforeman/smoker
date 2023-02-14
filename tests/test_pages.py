@@ -14,13 +14,13 @@ from selenium.common.exceptions import TimeoutException
 
 @pytest.fixture
 def firefox_options(firefox_options):
-    firefox_options.headless = True
+    firefox_options.add_argument('--headless')
     return firefox_options
 
 
 @pytest.fixture
 def chrome_options(chrome_options):
-    chrome_options.headless = True
+    chrome_options.add_argument('--headless')
     # The error log is a non-w3c option
     chrome_options.add_experimental_option('w3c', False)
     return chrome_options
