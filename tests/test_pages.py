@@ -13,7 +13,7 @@ from selenium.common.exceptions import TimeoutException
 
 
 EXCLUDE_ERRORS = (
-    # https://projects.theforeman.org/issues/36093
+    # Fixed in Foreman 3.7 - https://projects.theforeman.org/issues/36093
     'Scrollbar test exception: TypeError:',
 )
 
