@@ -7,40 +7,6 @@ from urllib.parse import urlparse
 
 User = namedtuple('User', ['username', 'password', 'name'])
 
-PAGES = [
-    '/',
-    '/architectures',
-    '/hosts',
-    '/models',
-    '/media',
-    '/operatingsystems',
-    '/templates/ptables',
-    '/templates/provisioning_templates',
-    '/hostgroups',
-    '/common_parameters',
-    '/environments',
-    '/puppetclasses',
-    '/config_groups',
-    '/variable_lookup_keys',
-    '/puppetclass_lookup_keys',
-    '/smart_proxies',
-    '/compute_resources',
-    '/compute_profiles',
-    '/subnets',
-    '/domains',
-    '/http_proxies',
-    '/realms',
-    '/locations',
-    '/organizations',
-    '/auth_source_ldaps',
-    '/users',
-    '/usergroups',
-    '/roles',
-    '/bookmarks',
-    '/settings',
-    '/about',
-]
-
 
 def pytest_generate_tests(metafunc):
     variables = metafunc.config._variables  # pylint: disable=protected-access
@@ -54,15 +20,11 @@ def pytest_generate_tests(metafunc):
 
         response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password),
                                 verify=False)
-        if response.status_code == 404:
-            # Menu is only available since Foreman 2.0
-            pages = [base_url + page for page in PAGES]
-        else:
-            assert response
-            pages = [pytest.param(base_url + page['url'], id=page['name'])
-                     for page in response.json()
-                     # logout has an error "Cannot read property 'icon' of null"
-                     if page['url'] != '/users/logout']
+        assert response
+        pages = [pytest.param(base_url + page['url'], id=page['name'])
+                 for page in response.json()
+                 # logout has an error "Cannot read property 'icon' of null"
+                 if page['url'] != '/users/logout']
 
         metafunc.parametrize('url', pages)
 
