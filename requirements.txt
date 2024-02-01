@@ -3,5 +3,5 @@ pytest-base-url
 pytest-html
 pytest-selenium
 pytest-testinfra
-pytest-variables
+pytest-variables<3
 pytest-xdist
