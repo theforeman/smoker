@@ -8,6 +8,10 @@ from urllib.parse import urlparse
 User = namedtuple('User', ['username', 'password', 'name'])
 
 
+def pytest_configure(config):
+    config.addinivalue_line('markers', 'internal: mark test as a self test')
+
+
 def pytest_generate_tests(metafunc):
     variables = metafunc.config._variables  # pylint: disable=protected-access
 
