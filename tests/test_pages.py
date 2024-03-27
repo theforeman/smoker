@@ -1,6 +1,7 @@
 # pylint: disable=redefined-outer-name
 from __future__ import print_function
 
+from enum import IntFlag
 from typing import Union, KeysView, List
 from urllib.parse import ParseResult, urlparse, parse_qs, urlencode
 
@@ -10,6 +11,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+
+
+# https://github.com/SeleniumHQ/selenium/wiki/Logging
+BrowserLogLevel = IntFlag('BrowserLogLevel', ['ALL', 'DEBUG', 'INFO', 'WARNING', 'SEVERE', 'OFF'])
 
 
 EXCLUDE_ERRORS = (
@@ -52,7 +57,7 @@ def filtered_url_query(url: str, allowed_query_params: Union[List, KeysView]) ->
 
 @pytest.mark.nondestructive
 @pytest.mark.selenium
-def test_menu_item(selenium, user, url):
+def test_menu_item(selenium, user, url, variables):
     selenium.get(url)
     assert selenium.current_url.endswith('/users/login'), 'Redirect to login page'
     login_field = selenium.find_element(By.NAME, 'login[login]')
@@ -82,5 +87,22 @@ def test_menu_item(selenium, user, url):
         print("https://github.com/mozilla/geckodriver/issues/284")
 
     logs = selenium.get_log('browser')
-    severe_messages = [x['message'] for x in logs if x.get('level') == 'SEVERE' and not any(excl in x['message'] for excl in EXCLUDE_ERRORS)]
-    assert severe_messages == [], 'Error messages with log level SEVERE in browser console'
+    threshold = BrowserLogLevel[variables.get('browser_log_threshold', 'SEVERE')]
+    messages = [x['message'] for x in logs
+                if BrowserLogLevel[x['level']] >= threshold
+                and not any(excl in x['message'] for excl in EXCLUDE_ERRORS)]
+    assert messages == [], f'Messages with log level {threshold} or above in browser console'
+
+
+@pytest.mark.parametrize('level,expected',
+                         [
+                             ('ALL', True),
+                             ('SEVERE', True),
+                             ('OFF', False),
+                         ])
+@pytest.mark.internal
+def test_browser_log_level(level, expected):
+    """
+    Self test the logic to determine if browser log matches
+    """
+    assert (BrowserLogLevel.SEVERE >= BrowserLogLevel[level]) == expected
