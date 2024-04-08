@@ -61,15 +61,9 @@ def test_menu_item(selenium, user, url):
     password_field.send_keys(user.password)
     password_field.submit()
 
-    # Foreman 2.5 changed the navigation
-    try:
-        account_menu = WebDriverWait(selenium, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'user-nav-item'))
-        )
-    except TimeoutException:
-        account_menu = WebDriverWait(selenium, 10).until(
-            EC.presence_of_element_located((By.ID, 'account_menu'))
-        )
+    account_menu = WebDriverWait(selenium, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, 'user-nav-item'))
+    )
     assert account_menu.text == user.name, 'Logged in user shows the correct name'
 
     expected_parsed_url = urlparse(url)
