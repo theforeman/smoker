@@ -3,7 +3,6 @@
   "password": "changeme",
   "clients": [
     "smoker-test/centos8:nightly",
-    "smoker-test/centos7:nightly",
-    "smoker-test/centos6:nightly"
+    "smoker-test/centos7:nightly"
   ]
 }

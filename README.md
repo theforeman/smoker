@@ -87,7 +87,40 @@ The set of clients to test must also be specified in `variables.json`:
 ```
   "clients": [
     "smoker-test/centos8:nightly",
-    "smoker-test/centos7:nightly",
+    "smoker-test/centos7:nightly"
+  ]
+```
+
+By default, the client tests support testing the EL7 and EL8 images due to the complexities of rootless containers with systemd.
+
+### EL6 Client Tests
+
+The EL6 client container based tests can be ran when using an EL7 host due to the complexities of running rootless containers with podman and systemd. To test this manully, assuming you have spun up an EL7 machine with podman present and smoker checked out, build the images:
+
+```
+./build_images.sh nightly
+```
+
+Now update the variables.json to include only the EL6 container:
+
+```
+  "clients": [
     "smoker-test/centos6:nightly"
   ]
+```
+
+Additionally, due to how logging is handled, inside `tests/test_content_client.py`, you'll need to update the podman run command:
+
+```
+    container_id = subprocess.check_output([
+        'podman',
+        'run',
+        '--systemd',
+        'always',
+        '--volume',
+        '/dev/log:/dev/log',
+        '--detach',
+        '--tty',
+        request.param
+    ]).decode().strip()
 ```

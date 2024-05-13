@@ -12,8 +12,8 @@ def katello_client(request, entities, registration_hostname):
     container_id = subprocess.check_output([
         'podman',
         'run',
-        '--volume',
-        '/dev/log:/dev/log',
+        '--systemd',
+        'always',
         '--detach',
         '--tty',
         request.param
@@ -104,8 +104,17 @@ def test_available_errata(katello_client, entities, api, os_release_major):
     katello_client.run('yum -y install walrus-0.71')
 
     host = foreman_host(katello_client, api)
-    errata = api.resource('errata').call('index', {'host_id': host['id']})
-    errata_ids = [erratum['errata_id'] for erratum in errata['results']]
+
+    retries = 0
+    while retries < 5:
+        retries += 1
+        errata = api.resource('errata').call('index', {'host_id': host['id']})
+        errata_ids = [erratum['errata_id'] for erratum in errata['results']]
+
+        if not errata_ids:
+            time.sleep(3)
+        else:
+            break
 
     assert entities['errata_id'] in errata_ids
 
