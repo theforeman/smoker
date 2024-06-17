@@ -5,3 +5,4 @@ pytest-selenium
 pytest-testinfra
 pytest-variables<3
 pytest-xdist
+tenacity<8.4.0
