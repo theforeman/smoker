@@ -20,6 +20,8 @@ BrowserLogLevel = IntFlag('BrowserLogLevel', ['ALL', 'DEBUG', 'INFO', 'WARNING',
 EXCLUDE_ERRORS = (
     # Fixed in Foreman 3.7 - https://projects.theforeman.org/issues/36093
     'Scrollbar test exception: TypeError:',
+    # New hosts page wants to load table_preferences, but those might not exist
+    'table_preferences/hosts'
 )
 
 
