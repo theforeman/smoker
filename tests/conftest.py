@@ -1,6 +1,8 @@
 import apypie
+import py.path
 import pytest
 import requests
+import uuid
 
 from functools import cached_property
 from pytest_variables.plugin import variables_key
@@ -102,3 +104,78 @@ def api(user, base_url):
 @pytest.fixture(scope='session')
 def registration_hostname(base_url):
     return urlparse(base_url).hostname
+
+
+@pytest.fixture(scope="module")
+def fixture_dir():
+    return py.path.local(__file__).realpath() / '..' / 'fixtures'
+
+
+@pytest.fixture
+def organization(api):
+    org = api.create('organizations', {'name': str(uuid.uuid4())})
+    yield org
+    api.delete('organizations', org)
+
+
+@pytest.fixture
+def product(organization, api):
+    prod = api.create('products', {'name': str(uuid.uuid4()), 'organization_id': organization['id']})
+    yield prod
+    api.delete('products', prod)
+
+
+@pytest.fixture
+def yum_repository(product, organization, api):
+    repo = api.create('repositories', {'name': str(uuid.uuid4()), 'product_id': product['id'], 'content_type': 'yum', 'url': 'https://fixtures.pulpproject.org/rpm-no-comps/'})
+    wait_for_metadata_generate(api)
+    yield repo
+    api.delete('repositories', repo)
+
+
+@pytest.fixture
+def file_repository(product, organization, api):
+    repo = api.create('repositories', {'name': str(uuid.uuid4()), 'product_id': product['id'], 'content_type': 'file', 'url': 'https://fixtures.pulpproject.org/file/'})
+    wait_for_metadata_generate(api)
+    yield repo
+    api.delete('repositories', repo)
+
+
+@pytest.fixture
+def container_repository(product, organization, api):
+    parameters = {
+        'name': str(uuid.uuid4()),
+        'product_id': product['id'],
+        'content_type': 'docker',
+        'url': 'https://quay.io/',
+        'docker_upstream_name': 'foreman/busybox-test',
+    }
+    repo = api.create('repositories', parameters)
+    wait_for_metadata_generate(api)
+    yield repo
+    api.delete('repositories', repo)
+
+
+@pytest.fixture
+def lifecycle_environment(organization, api):
+    library = api.list('lifecycle_environments', 'name=Library', {'organization_id': organization['id']})[0]
+    lce = api.create('lifecycle_environments', {'name': str(uuid.uuid4()), 'organization_id': organization['id'], 'prior_id': library['id']})
+    yield lce
+    api.delete('lifecycle_environments', lce)
+
+
+@pytest.fixture
+def content_view(organization, api):
+    cv = api.create('content_views', {'name': str(uuid.uuid4()), 'organization_id': organization['id']})
+    yield cv
+    api.delete('content_views', cv)
+
+
+def wait_for_tasks(api, search=None):
+    tasks = api.list('foreman_tasks', search=search)
+    for task in tasks:
+        api.wait_for_task(task)
+
+
+def wait_for_metadata_generate(api):
+    wait_for_tasks(api, 'label = Actions::Katello::Repository::MetadataGenerate')
