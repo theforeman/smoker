@@ -2,6 +2,7 @@ import apypie
 import pytest
 import requests
 
+from pytest_variables.plugin import variables_key
 from collections import namedtuple
 from urllib.parse import urlparse
 
@@ -13,14 +14,13 @@ def pytest_configure(config):
 
 
 def pytest_generate_tests(metafunc):
-    variables = metafunc.config._variables  # pylint: disable=protected-access
+    variables = metafunc.config.stash[variables_key]
 
     if 'url' in metafunc.fixturenames:
         base_url = metafunc.config.option.base_url
         assert base_url
 
-        # mimic the variables fixture from pytest-variables
-        user_obj = _user(metafunc.config._variables)  # pylint: disable=protected-access
+        user_obj = _user(variables)
 
         response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password),
                                 verify=False)
