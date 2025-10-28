@@ -2,6 +2,7 @@ import apypie
 import pytest
 import requests
 
+from functools import cached_property
 from pytest_variables.plugin import variables_key
 from collections import namedtuple
 from urllib.parse import urlparse
@@ -9,8 +10,29 @@ from urllib.parse import urlparse
 User = namedtuple('User', ['username', 'password', 'name'])
 
 
+class ForemanPlugins:
+    def __init__(self, config):
+        self._config = config
+
+    @cached_property
+    def plugins(self):
+        client = _api(_user(self._config.stash[variables_key]), self._config.option.base_url)
+        return {plugin['id'] for plugin in client.list('plugins')}
+
+
 def pytest_configure(config):
     config.addinivalue_line('markers', 'internal: mark test as a self test')
+    config.addinivalue_line('markers', 'plugin(name): mark test as a requiring a plugin')
+
+    config.foreman_plugins = ForemanPlugins(config)
+
+
+def pytest_runtest_setup(item):
+    plugin_markers = set(mark.args[0] for mark in item.iter_markers(name="plugin"))
+    if plugin_markers:
+        missing = plugin_markers - item.config.foreman_plugins.plugins
+        if missing:
+            pytest.skip("test requires plugin(s) {!r}".format(missing))
 
 
 def pytest_generate_tests(metafunc):
@@ -62,8 +84,7 @@ def entities():
     }
 
 
-@pytest.fixture(scope='session')
-def api(user, base_url):
+def _api(user, base_url):
     return apypie.ForemanApi(
         uri=base_url,
         username=user.username,
@@ -71,6 +92,11 @@ def api(user, base_url):
         api_version=2,
         verify_ssl=False,
     )
+
+
+@pytest.fixture(scope='session')
+def api(user, base_url):
+    return _api(user, base_url)
 
 
 @pytest.fixture(scope='session')
