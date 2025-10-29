@@ -64,7 +64,7 @@ def entities():
 
 @pytest.fixture(scope='session')
 def api(user, base_url):
-    return apypie.Api(
+    return apypie.ForemanApi(
         uri=base_url,
         username=user.username,
         password=user.password,

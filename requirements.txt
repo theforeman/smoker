@@ -1,4 +1,4 @@
-apypie
+apypie >= 0.5
 pytest-base-url
 pytest-html
 pytest-selenium
