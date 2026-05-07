@@ -8,5 +8,6 @@
   ],
   "headers": {
     "X-Clacks-Overhead": "GNU Terry Pratchett"
-  }
+  },
+  "host_resolver_rules": "MAP foreman.example.com 10.0.0.1"
 }

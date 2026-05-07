@@ -31,8 +31,11 @@ def firefox_options(firefox_options):
 
 
 @pytest.fixture
-def chrome_options(chrome_options):
+def chrome_options(chrome_options, variables):
     chrome_options.add_argument('--headless')
+    host_resolver_rules = variables.get('host_resolver_rules')
+    if host_resolver_rules:
+        chrome_options.add_argument(f'--host-resolver-rules={host_resolver_rules}')
     return chrome_options
 
 
