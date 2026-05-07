@@ -22,8 +22,10 @@ def pytest_generate_tests(metafunc):
 
         user_obj = _user(variables)
 
+        headers = variables.get('headers', {})
+
         response = requests.get(f'{base_url}/menu', auth=(user_obj.username, user_obj.password),
-                                verify=False)
+                                verify=False, headers=headers)
         assert response
         pages = [pytest.param(base_url + page['url'], id=page['name'])
                  for page in response.json()
@@ -63,14 +65,18 @@ def entities():
 
 
 @pytest.fixture(scope='session')
-def api(user, base_url):
-    return apypie.Api(
+def api(user, base_url, variables):
+    foremanpi = apypie.Api(
         uri=base_url,
         username=user.username,
         password=user.password,
         api_version=2,
         verify_ssl=False,
     )
+
+    headers = variables.get('headers', {})
+    foremanpi._session.headers.update(headers)
+    return foremanpi
 
 
 @pytest.fixture(scope='session')

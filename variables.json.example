@@ -5,5 +5,8 @@
     "smoker-test/centos8:nightly",
     "smoker-test/centos7:nightly",
     "smoker-test/centos6:nightly"
-  ]
+  ],
+  "headers": {
+    "X-Clacks-Overhead": "GNU Terry Pratchett"
+  }
 }
