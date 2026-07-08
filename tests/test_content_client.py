@@ -1,6 +1,5 @@
 import pytest
 import testinfra
-import time
 import subprocess
 
 
@@ -50,22 +49,9 @@ def os_release_major(katello_client):
     return katello_client.system_info.release.split('.')[0]
 
 
-def wait_for_task(task, api):
-    duration = 60
-    poll = 15
-
-    while task['state'] not in ['paused', 'stopped']:
-        duration -= poll
-        if duration <= 0:
-            break
-        time.sleep(poll)
-
-        task = api.resource('foreman_tasks').call('show', {'id': task['id']})
-
-
 def foreman_host(client, api):
     hostname = client.check_output('hostname -s')
-    return api.resource('hosts').call('show', {'id': hostname})
+    return api.show('hosts', hostname)
 
 
 def test_register_with_subscription_manager(katello_client, entities, api, user):
@@ -114,7 +100,7 @@ def test_available_errata(katello_client, entities, api, os_release_major):
 def test_katello_agent_package_install(katello_agent_client, api):
     host = foreman_host(katello_agent_client, api)
     task = api.resource('host_packages').call('install', {'host_id': host['id'], 'packages': ['gorilla']})
-    wait_for_task(task, api)
+    api.wait_for_task(task)
 
     gorilla = katello_agent_client.package('gorilla')
     assert gorilla.is_installed
@@ -130,7 +116,7 @@ def test_katello_agent_errata_install(katello_agent_client, entities, api):
         'included': {},
         'excluded': {}
     })
-    wait_for_task(task, api)
+    api.wait_for_task(task)
 
     walrus = katello_agent_client.package('walrus')
     assert walrus.is_installed
@@ -146,7 +132,7 @@ def test_katello_agent_remove_package(katello_agent_client, api):
     assert gorilla.is_installed
 
     task = api.resource('host_packages').call('remove', {'host_id': host['id'], 'packages': ['gorilla']})
-    wait_for_task(task, api)
+    api.wait_for_task(task)
     gorilla = katello_agent_client.package('gorilla')
     assert not gorilla.is_installed
 

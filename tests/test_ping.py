@@ -2,7 +2,7 @@ import warnings
 
 
 def test_ping(api):
-    ping = api.resource('ping').call('ping')['results']
+    ping = api.resource_action('ping', 'ping', {})['results']
 
     assert ping['foreman']['database']['active']
 
