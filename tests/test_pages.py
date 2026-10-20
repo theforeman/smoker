@@ -22,6 +22,9 @@ EXCLUDE_ERRORS = (
     # Modern Foreman PF components load table_preferences/<table>, but a preference
     # row might not exist yet for a given user+table combination on first load.
     'table_preferences/'
+    # The compliance app is not ready yet, but it's already linked up.
+    # See https://github.com/theforeman/foremanctl/pull/780
+    'assets/apps/compliance/index.html'
 )
 
 
